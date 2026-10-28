@@ -8,22 +8,22 @@ app = FastAPI(title="API Conversor de Moedas")
 
 REDIS_URL = os.getenv("REDIS_URL", "redis-cli --tls -u redis://default:gQAAAAAAA5PCAAIgcDFlYzZlYjQ3OTQ5ZjQ0MzVjOTBjNjM3NjZhZTE3NjI1OQ@meet-koi-234434.upstash.io:6379")
 
-# Conexão com o Redis (já rodando no seu Docker)
+# Conexão com o Redis
 r = redis.Redis.from_url(REDIS_URL, decode_responses=True)
 
-# Etapa 1: Cadastrar uma taxa
+# Cadastrar uma taxa
 @app.post("/taxas/{moeda}/{valor}", status_code=status.HTTP_201_CREATED)
 def cadastrar_taxa(moeda: str, valor: float):
     # Validar se a moeda é suportada e se o valor é > 0 (Retornar 400 Bad Request)
     if valor <= 0:
         raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="Valor deve ser maior que zero.")
 
-    # Salvar a taxa no Redis (ex: r.set(moeda, valor))
+    # Salvar a taxa no Redis
     r.set(moeda.upper(), valor)
     # Retornar mensagem de sucesso
     return {"message": f"Taxa salva. 1 USD = {valor} {moeda.upper()}"}
 
-# Etapa 2: Converter um valor
+# Converter um valor
 @app.get("/converter/{valor}/{moeda_origem}/{moeda_destino}")
 def converter(valor: float, moeda_origem: str, moeda_destino: str):
     # Validar se valor é > 0, moedas são diferentes e se existem no banco (Erros 400 e 404)
@@ -53,7 +53,7 @@ def converter(valor: float, moeda_origem: str, moeda_destino: str):
     r.ltrim("historico", 0, 4)  # Mantém apenas as últimas 5 conversões
     return resultado
 
-# Etapa 3: Histórico das últimas 5 conversões
+# Histórico das últimas 5 conversões
 @app.get("/conversoes")
 def historico():
     # Buscar a lista das últimas conversões no Redis

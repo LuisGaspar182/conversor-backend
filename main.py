@@ -6,7 +6,7 @@ from fastapi.middleware.cors import CORSMiddleware
 
 app = FastAPI(title="API Conversor de Moedas")
 
-REDIS_URL = os.getenv("REDIS_URL", "redis-cli --tls -u redis://default:gQAAAAAAA5PCAAIgcDFlYzZlYjQ3OTQ5ZjQ0MzVjOTBjNjM3NjZhZTE3NjI1OQ@meet-koi-234434.upstash.io:6379")
+REDIS_URL = os.getenv("REDIS_URL", "redis://localhost:6379")
 
 # Conexão com o Redis
 r = redis.Redis.from_url(REDIS_URL, decode_responses=True)
